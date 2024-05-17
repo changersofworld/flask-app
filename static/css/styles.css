@@ -1,0 +1,55 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: url('/static/download.jpg') no-repeat right top fixed, url('../css/download.jpg') repeat-y left top fixed;
+    /* Background image for the right side, and a repeating background image for the left side */
+    background-size: 50%100%, auto;
+    /* Set the background size for both images */
+    text-align: left;
+    color: black;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0);
+    padding: 70px;
+}
+
+.container {
+    max-width: 800px;
+    /* Maximum width for content */
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Semi-transparent white background */
+    border-radius: 8px;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+.section h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.section p {
+    font-size: 1.2em;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.description-input {
+    width: auto;
+    /* Set the width of the input field based on content */
+    height: auto;
+    /* Set the height of the input field based on content */
+    padding: 3px;
+    /* Add padding inside the input field */
+    margin-bottom: 5px;
+    /* Add some space below the input field */
+    border: 1px solid #ccc;
+    /* Add a border around the input field */
+    border-radius: 4px;
+    /* Add rounded corners to the input field */
+}

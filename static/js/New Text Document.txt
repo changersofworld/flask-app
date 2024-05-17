@@ -1,0 +1,38 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('add-report-form');
+    const reportsContainer = document.getElementById('reports');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(form);
+        fetch('/weekly_reports', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            loadReports();
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    function loadReports() {
+        fetch('/weekly_reports')
+        .then(response => response.json())
+        .then(data => {
+            reportsContainer.innerHTML = '';
+            data.forEach(report => {
+                const reportElement = document.createElement('div');
+                reportElement.innerHTML = `
+                    <h3>Week: ${report.week_start} - ${report.week_end}</h3>
+                    <p>${report.content}</p>
+                `;
+                reportsContainer.appendChild(reportElement);
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    loadReports();
+});

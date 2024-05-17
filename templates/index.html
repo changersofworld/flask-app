@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <h1>Welcome to My App</h1>
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('get_video_links') }}">Video Links</a></li>
+            <li><a href="{{ url_for('get_study_plans') }}">Study Plans</a></li>
+            <li><a href="{{ url_for('get_time_management_tasks') }}">Time Management</a></li>
+            <li><a href="{{ url_for('get_weekly_reports') }}">Weekly Reports</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>My Daily Targets</h1>
+
+        <!-- Form to add video links -->
+        <h2>Add Video Link</h2>
+        <form id="add-video-form">
+            <div class="form-group">
+                <label for="video-title">Title</label>
+                <input type="text" class="form-control" id="video-title" name="video-title">
+            </div>
+            <div class="form-group">
+                <label for="video-link">Link</label>
+                <input type="text" class="form-control" id="video-link" name="video-link">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Video Link</button>
+        </form>
+        <hr>
+
+        <!-- Video Links -->
+        <h2>Video Links</h2>
+        <ul id="video-list"></ul>
+        <hr>
+
+        <!-- Study Plans -->
+        <h2>Add Study Plan</h2>
+        <form id="add-study-plan-form">
+            <div class="form-group">
+                <label for="study-plan-title">Title</label>
+                <input type="text" class="form-control" id="study-plan-title" name="study-plan-title">
+            </div>
+            <div class="form-group">
+                <label for="study-plan-description">Description</label>
+                <textarea class="form-control" id="study-plan-description" name="study-plan-description"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="study-plan-due-date">Due Date</label>
+                <input type="date" class="form-control" id="study-plan-due-date" name="study-plan-due-date">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Study Plan</button>
+        </form>
+        <hr>
+
+        <h2>Study Plans</h2>
+        <ul id="study-plan-list"></ul>
+
+        <!-- Form to add time management tasks -->
+        <h2>Add Time Management Task</h2>
+        <form id="add-time-task-form">
+            <div class="form-group">
+                <label for="time-task">Task</label>
+                <input type="text" class="form-control" id="time-task" name="time-task">
+            </div>
+            <div class="form-group">
+                <label for="time-start">Start Time</label>
+                <input type="datetime-local" class="form-control" id="time-start" name="time-start">
+            </div>
+            <div class="form-group">
+                <label for="time-end">End Time</label>
+                <input type="datetime-local" class="form-control" id="time-end" name="time-end">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Time Management Task</button>
+        </form>
+        <hr>
+
+        <!-- Time Management Tasks -->
+        <h2>Time Management Tasks</h2>
+        <ul id="time-task-list"></ul>
+        <hr>
+
+        <!-- Form to add weekly reports -->
+        <h2>Weekly Reports</h2>
+        <form id="add-report-form">
+            <label for="week_start">Week Start:</label>
+            <input type="date" id="week_start" name="week_start" required><br>
+            <label for="week_end">Week End:</label>
+            <input type="date" id="week_end" name="week_end" required><br>
+            <label for="content">Content:</label>
+            <textarea id="content" name="content" required></textarea><br>
+            <button type="submit">Add Report</button>
+        </form>
+        <div id="reports">
+            <!-- Weekly reports will be displayed here -->
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/myapp.js') }}"></script>
+        <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+
+        <style>
+            textarea {
+                width: auto;
+                height: auto;
+                padding: 5px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                resize: vertical;
+            }
+        </style>
+
+        <script>
+            // Function to load study plan list
+            function loadStudyPlanList() {
+                $.get("/study_plans", function(data) {
+                    $('#study-plan-list').empty();
+                    data.forEach(function(plan) {
+                        var checked = localStorage.getItem('studyPlan-' + plan.id) === 'true' ? 'checked' : '';
+                        var description = plan.description ? plan.description : '';
+                        $('#study-plan-list').append('<li><input type="checkbox" class="study-plan-checkbox" data-id="' + plan.id + '" ' + checked + '> ' + plan.title + ' - <input type="text" class="description-input" data-id="' + plan.id + '" value="' + description + '" placeholder="Description"> - ' + plan.due_date + ' <button class="delete-study-plan" data-id="' + plan.id + '">Delete</button></li>');
+                    });
+                });
+            }
+
+            // Event listener for updating checkbox state
+            $('#study-plan-list').on('click', '.study-plan-checkbox', function() {
+                var id = $(this).data('id');
+                var checked = $(this).prop('checked');
+                localStorage.setItem('studyPlan-' + id, checked);
+            });
+
+            // Event listener for updating description
+            $('#study-plan-list').on('change', '.description-input', function() {
+                var id = $(this).data('id');
+                var description = $(this).val();
+                // Update description in the backend using AJAX
+                $.ajax({
+                    url: '/study_plans/' + id,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        description: description
+                    }),
+                    success: function(response) {
+                        console.log(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+
+            // Event listener for deleting a study plan
+            $('#study-plan-list').on('click', '.delete-study-plan', function() {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/study_plans/' + id,
+                    type: 'DELETE',
+                    success: function(response) {
+                        alert(response.message);
+                        loadStudyPlanList(); // Reload the study plan list
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        alert('An error occurred, study plan could not be deleted.');
+                    }
+                });
+            });
+
+            // Document ready function
+            $(document).ready(function() {
+                // Load study plan list on page load
+                loadStudyPlanList();
+            });
+        </script>
+
+</body>
+
+</html>
